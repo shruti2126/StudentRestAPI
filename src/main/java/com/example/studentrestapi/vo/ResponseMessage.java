@@ -6,7 +6,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class ResponseMessage {
+
     private String message;
+
     @JsonProperty("data")
     private Object body;
 

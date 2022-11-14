@@ -11,14 +11,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service("studentService")
-
 public class StudentServiceImpl implements StudentService {
 
 
@@ -41,8 +40,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public Student findById(long id) {
-        StudentEntity StudentEntity = studentRepo.findById(id).orElse(null);
-        return StudentEntityConverter.convertEntityToStudent(StudentEntity);
+        StudentEntity studentEntity = studentRepo.findById(id).orElse(null);
+        return StudentEntityConverter.convertEntityToStudent(studentEntity);
     }
 
     @Transactional

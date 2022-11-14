@@ -1,6 +1,7 @@
 package com.example.studentrestapi.vo;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Email;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
@@ -11,9 +12,7 @@ public class Student {
     @NotNull
     private String name;
 
-    //Neither of the following annotations work for the email validation
-//    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}", flags = Pattern.Flag.CASE_INSENSITIVE)
-    @Pattern(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}")
+    @Email
     private String email;
 
     public Student() {
@@ -23,6 +22,11 @@ public class Student {
     public Student(Long id, String name, String email) {
         super();
         this.id = id;
+        this.name = name;
+        this.email = email;
+    }
+
+    public Student(String name, String email) {
         this.name = name;
         this.email = email;
     }
@@ -49,5 +53,14 @@ public class Student {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }

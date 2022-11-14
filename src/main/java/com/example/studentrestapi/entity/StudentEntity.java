@@ -1,5 +1,7 @@
 package com.example.studentrestapi.entity;
 
+import com.example.studentrestapi.vo.Student;
+
 import javax.persistence.*;
 
 @Entity

@@ -7,6 +7,7 @@ import com.example.studentrestapi.vo.ErrorResponse;
 import com.example.studentrestapi.vo.ResponseMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -21,19 +22,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+
     @ExceptionHandler(StudentNameIsNullException.class)
     public ResponseEntity<ResponseMessage> nameNotProvided(Exception ex){
-        ResponseMessage res = new ResponseMessage();
-        res.setMessage(ex.getMessage());
+        ResponseMessage res = new ResponseMessage("name cannot be null.");
         return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(EmailAddressInvalidException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> emailInvalid(Exception ex){
-        ErrorResponse error = new ErrorResponse();
-        error.setErrorCode(HttpStatus.BAD_REQUEST.value());
-        error.setMessage(ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrorCode(HttpStatus.BAD_REQUEST.value());
+        errorResponse.setMessage(ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
 }

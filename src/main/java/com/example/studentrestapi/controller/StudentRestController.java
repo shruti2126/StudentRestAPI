@@ -17,10 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
@@ -39,7 +39,7 @@ public class StudentRestController {
      **/
     @ApiOperation(value = "gets a single student")
     @RequestMapping(value = "/student/{uid}", method = RequestMethod.GET)
-    public ResponseEntity<?> getStudent(@PathVariable("uid") long id) throws StudentException {
+    public ResponseEntity<Student> getStudent(@PathVariable("uid") long id) throws StudentException {
         Student student = studentService.findById(id);
         if (student == null) {
             throw new StudentNotFoundException();
@@ -54,11 +54,10 @@ public class StudentRestController {
      */
     @ApiOperation(value = "create a student")
     @RequestMapping(value = "/student", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseEntity<ResponseMessage> createStudent(@Valid @RequestBody Student student, UriComponentsBuilder ucBuilder) {
+    public ResponseEntity<ResponseMessage> createStudent(@Validated @RequestBody Student student, UriComponentsBuilder ucBuilder) {
         Student savedStudent = studentService.saveStudent(student);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/api/student/{id}").buildAndExpand(student.getId()).toUri());
-
         return new ResponseEntity<ResponseMessage>(new ResponseMessage("Student has been created successfully",savedStudent), headers, HttpStatus.CREATED);
     }
 
@@ -100,30 +99,30 @@ public class StudentRestController {
     }
 
     /**
-     * Get all users in the database
+     * Get all students in the database
      */
     @ApiOperation(value = "get students accordingly")
     @RequestMapping(value = "/students",  method = RequestMethod.GET)
-    public ResponseEntity<PagedResponse<Student>> getAllUsers(@RequestParam(required = false, defaultValue = "0") Integer pageNo,
+    public ResponseEntity<PagedResponse<Student>> getAllStudents(@RequestParam(required = false, defaultValue = "0") Integer pageNo,
                                                                  @RequestParam(required = false, defaultValue = "5") Integer rows,
                                                                  @RequestParam(required = false, defaultValue = "name") String orderBy) {
 
-        PagedResponse<Student> users = studentService.findPaginated(pageNo, rows, orderBy);
-        if (users.isEmpty()) {
+        PagedResponse<Student> students = studentService.findPaginated(pageNo, rows, orderBy);
+        if (students.isEmpty()) {
             throw new StudentNotFoundException();
         }
-        return new ResponseEntity<PagedResponse<Student>>(users, HttpStatus.OK);
+        return new ResponseEntity<PagedResponse<Student>>(students, HttpStatus.OK);
 
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ErrorResponse> exceptionHandler(Exception ex) {
-//        ErrorResponse error = new ErrorResponse();
-//        error.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-//        error.setMessage(ex.getMessage());
-////        logger.error("Controller Error",ex);
-//        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> exceptionHandler(Exception ex) {
+        ErrorResponse error = new ErrorResponse();
+        error.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        error.setMessage(ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
     @ExceptionHandler(StudentNotFoundException.class)
     public ResponseEntity<ErrorResponse> exceptionHandlerStudentNotFound(Exception ex) {
@@ -133,4 +132,6 @@ public class StudentRestController {
         error.setMessage(ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
+
+
 }
